@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전우 모임 — 날짜 조율</title>
+  <meta name="description" content="해병대 & 특전사 전우 모임 날짜 조율 캘린더. 참석 가능 날짜를 표시하고 모임 일정을 잡아보세요.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Background texture overlay -->
+  <div class="bg-texture"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="header-inner">
+      <div class="logo-section">
+        <div class="emblem">
+          <svg viewBox="0 0 64 64" class="star-emblem" aria-hidden="true">
+            <polygon points="32,4 39,24 60,24 43,36 49,56 32,44 15,56 21,36 4,24 25,24" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="title-group">
+          <h1>전우 모임</h1>
+          <p class="subtitle">날짜 조율 캘린더 — 2026</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="user-badge" id="user-badge">
+          <div class="badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <span class="badge-name" id="current-user-name">이름 선택</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- User Selection Modal -->
+  <div class="modal-overlay" id="user-modal-overlay">
+    <div class="modal" id="user-modal">
+      <div class="modal-header">
+        <h2>참석자 선택</h2>
+        <button class="modal-close" id="modal-close-btn" aria-label="닫기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="member-grid" id="member-grid">
+          <!-- Members will be injected by JS -->
+        </div>
+        <div class="add-member-section">
+          <input type="text" id="new-member-input" placeholder="새 멤버 이름 입력" maxlength="10">
+          <button class="btn btn-add" id="add-member-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            추가
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Month Navigation -->
+    <div class="month-tabs" id="month-tabs">
+      <button class="month-tab active" data-month="6" id="tab-july">
+        <span class="month-num">07</span>
+        <span class="month-name">JULY</span>
+      </button>
+      <button class="month-tab" data-month="7" id="tab-august">
+        <span class="month-num">08</span>
+        <span class="month-name">AUGUST</span>
+      </button>
+    </div>
+
+    <!-- Calendar Container -->
+    <div class="calendar-wrapper">
+      <div class="calendar-card">
+        <!-- Weekday Headers -->
+        <div class="weekday-header">
+          <div class="weekday sun">일</div>
+          <div class="weekday">월</div>
+          <div class="weekday">화</div>
+          <div class="weekday">수</div>
+          <div class="weekday">목</div>
+          <div class="weekday">금</div>
+          <div class="weekday sat">토</div>
+        </div>
+        <!-- Calendar Grid -->
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Days will be injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend & Summary -->
+    <div class="bottom-section">
+      <div class="legend-card">
+        <h3>범례</h3>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-dot available"></span>
+            <span>참석 가능</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot maybe"></span>
+            <span>미정</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot unavailable"></span>
+            <span>불가</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot best"></span>
+            <span>최적 날짜</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card" id="summary-card">
+        <h3>참석 현황</h3>
+        <div class="summary-content" id="summary-content">
+          <p class="summary-placeholder">날짜를 클릭하여 참석 여부를 표시하세요</p>
+        </div>
+      </div>
+
+      <div class="members-card">
+        <h3>참석자 목록</h3>
+        <div class="members-list" id="members-list">
+          <!-- Members will be injected by JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message"></span>
+  </div>
+
+  <!-- Footer -->
+  <footer id="main-footer">
+    <div class="footer-inner">
+      <div class="footer-emblem">★</div>
+      <p>전우 모임 날짜 조율 시스템 — 충성!</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
