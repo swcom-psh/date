@@ -219,6 +219,43 @@ function handleDayClick(dateStr) {
   } else {
     showToast(`${dateStr.slice(5)} → 선택 해제`);
   }
+
+  // Google Apps Script와 연결하여 시트에 기록 전송
+  sendDataToGoogleSheet(state.currentUser, dateStr, next);
+}
+
+// ---- Google Sheets Integration ----
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDlevWg28EbfqggnFG6teQv_Qx8WyOjfMOKp4pnIxNvemuAGJWCbhyoQ-JAMPQivwE9g/exec';
+
+function sendDataToGoogleSheet(memberId, dateStr, status) {
+  if (APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+    console.log('Google Apps Script URL이 설정되지 않았습니다.');
+    return;
+  }
+
+  const member = state.members.find(m => m.id === memberId);
+  if (!member) return;
+
+  const payload = {
+    name: member.name,
+    date: dateStr,
+    status: status || ""
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // CORS 정책 우회를 위해 no-cors 사용 (웹앱 실행결과를 UI에서 꼭 읽을 필요는 없으므로)
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    console.log(`구글 시트 전송 완료: ${member.name}, ${dateStr}, ${status}`);
+  })
+  .catch(error => {
+    console.error('구글 시트 전송 에러:', error);
+  });
 }
 
 // ---- Context Menu ----
@@ -302,6 +339,10 @@ function applyContextStatus(status) {
 
   const labels = { available: '참석 가능', maybe: '미정', unavailable: '불가', clear: '선택 해제' };
   showToast(`${contextDate.slice(5)} → ${labels[status]}`);
+
+  // Google Apps Script와 연결하여 시트에 기록 전송
+  const currentStatus = status === 'clear' ? null : status;
+  sendDataToGoogleSheet(state.currentUser, contextDate, currentStatus);
 }
 
 // ---- Month Tabs ----
