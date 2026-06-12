@@ -614,7 +614,7 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
 }
 
@@ -631,6 +631,9 @@ body {
   border: 1px solid transparent;
   gap: 2px;
   min-height: 48px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
 }
 
 .day-cell:not(.empty):not(.other-month):hover {
@@ -677,31 +680,28 @@ body {
 }
 
 /* Availability indicators */
-.availability-dots {
+/* Availability indicator wrapper & Gradient Bar */
+.availability-indicator-wrapper {
   display: flex;
-  gap: 3px;
-  min-height: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 8px;
+  margin-top: 2px;
+  padding: 0 6px;
+  box-sizing: border-box;
 }
 
-.avail-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.avail-bar {
+  width: 70%;
+  height: 4px;
+  border-radius: 2px;
   transition: all 0.3s var(--ease-spring);
+  display: block;
 }
 
-.avail-dot.available {
-  background: var(--available);
-  box-shadow: 0 0 6px var(--available-glow);
-}
-
-.avail-dot.maybe {
-  background: var(--maybe);
-  box-shadow: 0 0 6px var(--maybe-glow);
-}
-
-.avail-dot.unavailable {
-  background: var(--unavailable);
+.avail-bar.gradient-bar {
+  /* background will be set dynamically via JS */
 }
 
 /* Status indicator on cell */
@@ -742,15 +742,40 @@ body {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Count badge */
+/* Count badge - repositioned to top-right of cell */
 .count-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
   font-size: 0.55rem;
   font-weight: 700;
   color: var(--available);
-  background: hsla(140, 45%, 40%, 0.15);
-  padding: 1px 6px;
-  border-radius: 10px;
-  line-height: 1.4;
+  background: hsla(175, 60%, 48%, 0.15);
+  border: 1px solid hsla(175, 60%, 48%, 0.25);
+  padding: 1px 4px;
+  border-radius: 4px;
+  line-height: 1.1;
+  z-index: 5;
+}
+
+/* Adjust count badge position if it is the best date (avoiding overlap with star) */
+.day-cell.best-date .count-badge {
+  right: 18px;
+}
+
+/* Heatmap levels based on attendee count */
+.day-cell.heat-1 {
+  background: hsla(175, 60%, 48%, 0.04);
+  border-color: hsla(175, 60%, 48%, 0.12);
+}
+.day-cell.heat-2 {
+  background: hsla(175, 60%, 48%, 0.1);
+  border-color: hsla(175, 60%, 48%, 0.28);
+}
+.day-cell.heat-3 {
+  background: hsla(175, 60%, 48%, 0.18);
+  border-color: hsla(175, 60%, 48%, 0.48);
+  box-shadow: inset 0 0 10px hsla(175, 60%, 48%, 0.1);
 }
 
 /* ---------- Bottom Section ---------- */
@@ -1154,9 +1179,15 @@ body {
     font-size: 0.82rem;
   }
 
-  .avail-dot {
-    width: 5px;
-    height: 5px;
+  .availability-indicator-wrapper {
+    padding: 0 4px;
+    height: 6px;
+    margin-top: 1px;
+  }
+
+  .avail-bar {
+    width: 80%;
+    height: 3px;
   }
 
   .bottom-section {
@@ -1205,7 +1236,13 @@ body {
   }
 
   .count-badge {
-    display: none;
+    font-size: 0.5rem;
+    padding: 0px 3px;
+    top: 2px;
+    right: 3px;
+  }
+  .day-cell.best-date .count-badge {
+    right: 12px;
   }
 }
 

@@ -98,6 +98,17 @@ function renderCalendar() {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfWeek(year, month);
 
+  // Calculate maximum availability count for this month to highlight the best date
+  let maxAvailCount = 0;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = formatDate(year, month, day);
+    const dateAvail = state.availability[dateStr] || {};
+    const availCount = Object.values(dateAvail).filter(s => s === 'available').length;
+    if (availCount > maxAvailCount) {
+      maxAvailCount = availCount;
+    }
+  }
+
   // Previous month days
   const prevMonth = month - 1;
   const daysInPrevMonth = getDaysInMonth(year, prevMonth);
@@ -126,6 +137,22 @@ function renderCalendar() {
     // Check availability
     const dateAvail = state.availability[dateStr] || {};
     const availCount = Object.values(dateAvail).filter(s => s === 'available').length;
+
+    // Apply heatmap classes based on attendee count
+    if (availCount > 0) {
+      if (availCount >= 6) {
+        classes += ' heat-3';
+      } else if (availCount >= 3) {
+        classes += ' heat-2';
+      } else {
+        classes += ' heat-1';
+      }
+    }
+
+    // Highlight the best date(s) (highest attendance, must be at least 1 person)
+    if (maxAvailCount > 0 && availCount === maxAvailCount) {
+      classes += ' best-date';
+    }
 
     // Current user status — simple toggle
     if (state.currentUser && dateAvail[state.currentUser] === 'available') {
@@ -157,19 +184,36 @@ function renderCalendar() {
 }
 
 function renderAvailabilityDots(dateAvail) {
-  const entries = Object.entries(dateAvail);
-  if (entries.length === 0) return '<div class="availability-dots"></div>';
+  const entries = Object.entries(dateAvail).filter(([, status]) => status === 'available');
+  if (entries.length === 0) return '<div class="availability-indicator-wrapper"></div>';
 
-  let dots = '';
-  entries.forEach(([memberId, status]) => {
-    if (status === 'available') {
-      const member = state.members.find(m => m.id === memberId);
-      const color = member ? member.color : 'var(--available)';
-      dots += `<span class="avail-dot" style="background-color: ${color}; box-shadow: 0 0 6px ${color};"></span>`;
+  // Extract colors for members who are available on this date
+  const colors = [];
+  entries.forEach(([memberId]) => {
+    const member = state.members.find(m => m.id === memberId);
+    if (member) {
+      colors.push(member.color);
     }
   });
 
-  return `<div class="availability-dots">${dots}</div>`;
+  if (colors.length === 0) return '<div class="availability-indicator-wrapper"></div>';
+
+  let backgroundStyle = '';
+  let shadowStyle = '';
+
+  if (colors.length === 1) {
+    // Single attendee: flat color bar
+    backgroundStyle = colors[0];
+    shadowStyle = `0 0 6px ${colors[0]}`;
+  } else {
+    // Multiple attendees: linear gradient blending their theme colors
+    backgroundStyle = `linear-gradient(90deg, ${colors.join(', ')})`;
+    shadowStyle = `0 0 6px ${colors[0]}`;
+  }
+
+  return `<div class="availability-indicator-wrapper">
+    <span class="avail-bar gradient-bar" style="background: ${backgroundStyle}; box-shadow: ${shadowStyle};"></span>
+  </div>`;
 }
 
 function renderTooltip(dateStr, dateAvail) {
