@@ -21,7 +21,8 @@ function doPost(e) {
     var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     var colIndex = -1;
     for (var i = 0; i < headers.length; i++) {
-      var headerVal = headers[i].toString();
+      // ★ 헤더 셀이 Date 객체일 수 있으므로 headerCellToString으로 안전하게 변환
+      var headerVal = headerCellToString(headers[i]);
       // "7/1(수" 등 괄호가 붙어 있는 경우가 있으므로 startWith 등으로 유연하게 비교합니다.
       if (headerVal.indexOf(formattedDate) === 0 || headerVal === formattedDate) {
         colIndex = i + 1; // 1-based index
@@ -37,11 +38,16 @@ function doPost(e) {
     }
 
     // 2. 구글 시트의 첫 번째 열(A열)에서 사용자 이름 행 인덱스 찾기
-    var names = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
+    // ★ 버그 수정: 헤더 행(1행)을 포함해 검색하면 만약 이름이 헤더 셀과 일치할 경우 1행(헤더)를 덮어쓸 위험이 있음.
+    // 2행(첫 번째 데이터 행)부터 검색하도록 수정.
+    var lastRowNow = sheet.getLastRow();
+    var nameValues = lastRowNow > 1
+      ? sheet.getRange(2, 1, lastRowNow - 1, 1).getValues()
+      : [];
     var rowIndex = -1;
-    for (var j = 0; j < names.length; j++) {
-      if (names[j][0].toString().trim() === name.trim()) {
-        rowIndex = j + 1; // 1-based index
+    for (var j = 0; j < nameValues.length; j++) {
+      if (nameValues[j][0].toString().trim() === name.trim()) {
+        rowIndex = j + 2; // 1-based, 2행부터 검색했으므로 j=0 → row 2
         break;
       }
     }
@@ -94,6 +100,17 @@ function convertDateToHeaderFormat(dateStr) {
   return dateStr;
 }
 
+// ★ 헤더 셀이 Date 객체(구글 시트가 날짜 형식으로 저장한 경우)를 심쬠하면 "M/D" 형식으로 변환
+// Google Sheets에서 헤더 셀을 일반 텍스트로 입력하지 않으면 Date 객체로 저장되고
+// .toString()은 "Thu Jul 01 2021..." 같은 문자열이 돼 매칭이 실패됨.
+function headerCellToString(cell) {
+  if (cell instanceof Date) {
+    // Date 객체에서 직접 "M/D" 형식으로 변환 (영향받지 않는 안전한 방법)
+    return (cell.getMonth() + 1) + "/" + cell.getDate();
+  }
+  return cell.toString().trim();
+}
+
 // 4. 구글 시트에서 참석 데이터를 조회하여 프론트엔드로 전달하는 doGet 핸들러
 function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -118,10 +135,11 @@ function doGet(e) {
 
     var availability = {};
 
-    // 날짜 헤더 변환 및 매핑 (예: "7/1(수)" -> "2026-07-01")
+    // 날짜 헤더 변환 및 매핑 (예: "7/1(수)" 또는 Date 객체 -> "2026-07-01")
     var dateMapping = [];
     for (var i = 0; i < headers.length; i++) {
-      var headerStr = headers[i].toString().trim();
+      // ★ 헤더 셀이 Date 객체일 수 있으므로 headerCellToString으로 안전하게 변환
+      var headerStr = headerCellToString(headers[i]);
       var match = headerStr.match(/(\d+)\/(\d+)/);
       if (match) {
         var m = match[1];

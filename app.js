@@ -295,19 +295,25 @@ function sendDataToGoogleSheet(memberId, dateStr, status) {
     status: status || ""
   };
 
+  // no-cors 모드에서는 Content-Type: application/json이 CORS-safelisted 헤더가 아니라
+  // 브라우저가 강제로 제거하거나 text/plain으로 바꿈. body는 그대로 전송되므로
+  // 명시적으로 text/plain을 써서 "simple request"로 보내는 것이 올바름.
+  // (Apps Script doPost에서는 e.postData.contents로 raw body를 읽으므로 JSON.parse 정상 동작)
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
-    mode: 'no-cors', // CORS 정책 우회를 위해 no-cors 사용 (웹앱 실행결과를 UI에서 꼭 읽을 필요는 없으므로)
+    mode: 'no-cors',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'text/plain' // simple request → preflight 없이 전송, body는 JSON 문자열
     },
     body: JSON.stringify(payload)
   })
   .then(() => {
-    console.log(`구글 시트 전송 완료: ${member.name}, ${dateStr}, ${status}`);
+    // no-cors 응답은 항상 opaque(불투명)해서 성공/실패를 알 수 없음.
+    // 요청이 네트워크 레벨에서 날아갔다는 의미일 뿐.
+    console.log(`구글 시트 전송 시도: ${member.name}, ${dateStr}, ${status}`);
   })
   .catch(error => {
-    console.error('구글 시트 전송 에러:', error);
+    console.error('구글 시트 전송 에러(네트워크 오류):', error);
   });
 }
 
@@ -330,7 +336,7 @@ function fetchDataFromGoogleSheet() {
             let member = state.members.find(m => m.name === name);
             if (!member) {
               // Create a unique new ID and HSL color dynamically to recover missing members
-              const newId = 'm_' + name + '_' + Math.random().toString(36).substr(2, 4);
+              const newId = 'm_' + name; // 이름 기반 고정 ID (랜덤 제거 → 새로고침 시 중복 방지)
               const color = AVATAR_COLORS[state.members.length % AVATAR_COLORS.length];
               member = { id: newId, name: name, color: color };
               state.members.push(member);
@@ -340,24 +346,38 @@ function fetchDataFromGoogleSheet() {
           });
         });
 
-        // 덮어씌우는 대신, 로컬 데이터와 구글 시트 데이터를 안전하게 병합합니다.
-        // 현재 로그인한 사용자(state.currentUser)의 로컬 변경 사항이 구글 시트 응답의 이전 값에 의해 덮어씌워지지 않도록 보호합니다.
-        const mergedAvailability = { ...state.availability };
-        
-        Object.entries(mappedAvailability).forEach(([dateStr, nameMap]) => {
-          if (!mergedAvailability[dateStr]) {
-            mergedAvailability[dateStr] = {};
+        // ★★ 병합 로직 재작성 ★★
+        // 기존 문제: 로컬 상태를 복사한 뒤 시트 데이터를 "추가"만 했음.
+        //   → 다른 멤버가 선택을 취소해도(시트에서 셀이 비워져도) 로컬에서 절대 지워지지 않는 버그.
+        // 올바른 알고리즘:
+        //   1단계: 로컬 deep copy에서 "현재 사용자 외" 모든 멤버 데이터를 먼저 삭제
+        //   2단계: 시트에서 받은 데이터(있는 것만)를 다시 채워 넣음
+        //   → 이렇게 하면 시트에서 사라진 다른 멤버 데이터가 화면에서도 사라짐
+
+        const mergedAvailability = JSON.parse(JSON.stringify(state.availability));
+
+        // [1단계] 현재 사용자를 제외한 다른 멤버 데이터를 전부 삭제
+        Object.keys(mergedAvailability).forEach(dateKey => {
+          Object.keys(mergedAvailability[dateKey]).forEach(memberId => {
+            if (!state.currentUser || memberId !== state.currentUser) {
+              delete mergedAvailability[dateKey][memberId];
+            }
+          });
+          // 현재 사용자 데이터도 없는 빈 날짜 객체는 정리
+          if (Object.keys(mergedAvailability[dateKey]).length === 0) {
+            delete mergedAvailability[dateKey];
           }
-          
-          Object.entries(nameMap).forEach(([memberId, status]) => {
-            // 로그인한 사용자 본인의 데이터는 로컬의 최신 상태를 우선 보존합니다.
-            if (state.currentUser && memberId === state.currentUser) {
-              if (mergedAvailability[dateStr][memberId] === undefined) {
-                mergedAvailability[dateStr][memberId] = status;
-              }
-            } else {
-              // 다른 사용자 데이터는 구글 시트 최신본으로 업데이트합니다.
-              mergedAvailability[dateStr][memberId] = status;
+        });
+
+        // [2단계] 시트에서 받은 데이터를 다른 멤버에 한해서만 채워 넣음
+        Object.entries(mappedAvailability).forEach(([dateKey, memberMap]) => {
+          if (!mergedAvailability[dateKey]) {
+            mergedAvailability[dateKey] = {};
+          }
+          Object.entries(memberMap).forEach(([memberId, memberStatus]) => {
+            // 현재 사용자 데이터는 건드리지 않음(로컬 우선)
+            if (!state.currentUser || memberId !== state.currentUser) {
+              mergedAvailability[dateKey][memberId] = memberStatus;
             }
           });
         });
@@ -592,6 +612,10 @@ function init() {
 
   // 구글 시트에서 최신 참석 현황 데이터 불러오기
   fetchDataFromGoogleSheet();
+
+  // ★ 30초마다 자동으로 구글 시트 최신 데이터 갱신
+  // 다른 멤버가 날짜를 선택하면 페이지 새로고침 없이도 자동 반영됨.
+  setInterval(fetchDataFromGoogleSheet, 30000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
