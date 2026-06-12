@@ -249,11 +249,11 @@ function handleDayClick(dateStr) {
       delete state.availability[dateStr];
     }
     showToast(`${dateStr.slice(5)} → 미참`);
-    sendDataToGoogleSheet(state.currentUser, dateStr, null);
+    sendDataToGoogleSheetDebounced(state.currentUser, dateStr, null);
   } else {
     state.availability[dateStr][state.currentUser] = 'available';
     showToast(`${dateStr.slice(5)} → 참석 가능`);
-    sendDataToGoogleSheet(state.currentUser, dateStr, 'available');
+    sendDataToGoogleSheetDebounced(state.currentUser, dateStr, 'available');
   }
 
   saveState();
@@ -264,6 +264,21 @@ function handleDayClick(dateStr) {
 
 // ---- Google Sheets Integration ----
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDlevWg28EbfqggnFG6teQv_Qx8WyOjfMOKp4pnIxNvemuAGJWCbhyoQ-JAMPQivwE9g/exec';
+
+// Debounce queue to avoid network spamming on rapid toggles
+const sheetSendTimers = {};
+
+function sendDataToGoogleSheetDebounced(memberId, dateStr, status) {
+  const timerKey = `${memberId}_${dateStr}`;
+  if (sheetSendTimers[timerKey]) {
+    clearTimeout(sheetSendTimers[timerKey]);
+  }
+
+  sheetSendTimers[timerKey] = setTimeout(() => {
+    sendDataToGoogleSheet(memberId, dateStr, status);
+    delete sheetSendTimers[timerKey];
+  }, 500);
+}
 
 function sendDataToGoogleSheet(memberId, dateStr, status) {
   if (APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
@@ -312,10 +327,16 @@ function fetchDataFromGoogleSheet() {
         Object.entries(data.availability).forEach(([dateStr, nameMap]) => {
           mappedAvailability[dateStr] = {};
           Object.entries(nameMap).forEach(([name, status]) => {
-            const member = state.members.find(m => m.name === name);
-            if (member) {
-              mappedAvailability[dateStr][member.id] = status;
+            let member = state.members.find(m => m.name === name);
+            if (!member) {
+              // Create a unique new ID and HSL color dynamically to recover missing members
+              const newId = 'm_' + name + '_' + Math.random().toString(36).substr(2, 4);
+              const color = AVATAR_COLORS[state.members.length % AVATAR_COLORS.length];
+              member = { id: newId, name: name, color: color };
+              state.members.push(member);
+              saveState();
             }
+            mappedAvailability[dateStr][member.id] = status;
           });
         });
 

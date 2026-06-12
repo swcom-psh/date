@@ -89,6 +89,23 @@ body {
   position: relative;
 }
 
+/* ---------- Main App Layout Isolation & Fade-in ---------- */
+#main-header,
+#main-content,
+#main-footer {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.login-active #main-header,
+body.login-active #main-content,
+body.login-active #main-footer {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+}
+
 /* ---------- Background Effects ---------- */
 .bg-texture {
   position: fixed;
