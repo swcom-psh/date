@@ -1,5 +1,5 @@
 /* =========================================
-   전우 모임 — Application Logic
+   테토남 모임 — Application Logic
    ========================================= */
 
 // ---- Data Store ----
@@ -115,26 +115,18 @@ function renderCalendar() {
 
     // Check availability
     const dateAvail = state.availability[dateStr] || {};
-    const statuses = Object.values(dateAvail);
-    const availCount = statuses.filter(s => s === 'available').length;
-    const maybeCount = statuses.filter(s => s === 'maybe').length;
-    const totalMembers = state.members.length;
+    const availCount = Object.values(dateAvail).filter(s => s === 'available').length;
 
-    // Current user status
-    if (state.currentUser && dateAvail[state.currentUser]) {
-      classes += ` status-${dateAvail[state.currentUser]}`;
-    }
-
-    // Best date (all or most available)
-    if (totalMembers > 0 && availCount >= Math.ceil(totalMembers * 0.7) && availCount >= 2) {
-      classes += ' best-date';
+    // Current user status — simple toggle
+    if (state.currentUser && dateAvail[state.currentUser] === 'available') {
+      classes += ' status-available';
     }
 
     // Stagger animation delay
     const delay = (firstDay + day - 1) * 0.02;
 
     html += `<div class="${classes}" data-date="${dateStr}" style="animation-delay: ${delay}s"
-      onclick="handleDayClick('${dateStr}')" oncontextmenu="handleDayContext(event, '${dateStr}')">
+      onclick="handleDayClick('${dateStr}')">
       <span class="day-number">${day}</span>
       ${renderAvailabilityDots(dateAvail)}
       ${availCount > 0 ? `<span class="count-badge">${availCount}명</span>` : ''}
@@ -167,20 +159,18 @@ function renderAvailabilityDots(dateAvail) {
 }
 
 function renderTooltip(dateStr, dateAvail) {
-  const entries = Object.entries(dateAvail);
+  const entries = Object.entries(dateAvail).filter(([, s]) => s === 'available');
   if (entries.length === 0) return '';
 
-  const lines = entries.map(([memberId, status]) => {
+  const names = entries.map(([memberId]) => {
     const member = state.members.find(m => m.id === memberId);
-    const name = member ? member.name : memberId;
-    const statusLabel = { available: '✓ 참석', maybe: '△ 미정', unavailable: '✕ 불가' }[status];
-    return `${name}: ${statusLabel}`;
-  }).join(' · ');
+    return member ? member.name : memberId;
+  }).join(', ');
 
-  return `<div class="day-tooltip">${lines}</div>`;
+  return `<div class="day-tooltip">참석: ${names}</div>`;
 }
 
-// ---- Day Click Handler ----
+// ---- Day Click Handler (Toggle: available / none) ----
 function handleDayClick(dateStr) {
   if (!state.currentUser) {
     showToast('먼저 참석자를 선택하세요!');
@@ -194,34 +184,24 @@ function handleDayClick(dateStr) {
 
   const current = state.availability[dateStr][state.currentUser];
 
-  // Cycle: none -> available -> maybe -> unavailable -> none
-  const cycle = [undefined, 'available', 'maybe', 'unavailable'];
-  const idx = cycle.indexOf(current);
-  const next = cycle[(idx + 1) % cycle.length];
-
-  if (next === undefined) {
+  // Simple toggle: none -> available -> none
+  if (current === 'available') {
     delete state.availability[dateStr][state.currentUser];
     if (Object.keys(state.availability[dateStr]).length === 0) {
       delete state.availability[dateStr];
     }
+    showToast(`${dateStr.slice(5)} → 미참`);
+    sendDataToGoogleSheet(state.currentUser, dateStr, null);
   } else {
-    state.availability[dateStr][state.currentUser] = next;
+    state.availability[dateStr][state.currentUser] = 'available';
+    showToast(`${dateStr.slice(5)} → 참석 가능`);
+    sendDataToGoogleSheet(state.currentUser, dateStr, 'available');
   }
 
   saveState();
   renderCalendar();
   renderSummary();
   renderMembersList();
-
-  const labels = { available: '참석 가능', maybe: '미정', unavailable: '불가' };
-  if (next) {
-    showToast(`${dateStr.slice(5)} → ${labels[next]}`);
-  } else {
-    showToast(`${dateStr.slice(5)} → 선택 해제`);
-  }
-
-  // Google Apps Script와 연결하여 시트에 기록 전송
-  sendDataToGoogleSheet(state.currentUser, dateStr, next);
 }
 
 // ---- Google Sheets Integration ----
@@ -258,91 +238,12 @@ function sendDataToGoogleSheet(memberId, dateStr, status) {
   });
 }
 
-// ---- Context Menu ----
-let contextMenu = null;
-
-function createContextMenu() {
-  if (contextMenu) return;
-  contextMenu = document.createElement('div');
-  contextMenu.className = 'context-menu';
-  contextMenu.innerHTML = `
-    <button class="context-option" data-status="available">
-      <span class="opt-dot green"></span>참석 가능
-    </button>
-    <button class="context-option" data-status="maybe">
-      <span class="opt-dot yellow"></span>미정
-    </button>
-    <button class="context-option" data-status="unavailable">
-      <span class="opt-dot red"></span>불가
-    </button>
-    <button class="context-option" data-status="clear">
-      <span class="opt-dot clear"></span>선택 해제
-    </button>
-  `;
-  document.body.appendChild(contextMenu);
-
-  contextMenu.querySelectorAll('.context-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const status = btn.dataset.status;
-      applyContextStatus(status);
-    });
-  });
-
-  document.addEventListener('click', () => closeContextMenu());
-}
-
-let contextDate = null;
-
-function handleDayContext(e, dateStr) {
-  e.preventDefault();
-  if (!state.currentUser) {
-    showToast('먼저 참석자를 선택하세요!');
-    openModal();
-    return;
-  }
-
-  createContextMenu();
-  contextDate = dateStr;
-
-  contextMenu.style.left = e.clientX + 'px';
-  contextMenu.style.top = e.clientY + 'px';
-  contextMenu.classList.add('active');
-}
-
-function closeContextMenu() {
-  if (contextMenu) {
-    contextMenu.classList.remove('active');
-  }
-}
-
-function applyContextStatus(status) {
-  if (!contextDate || !state.currentUser) return;
-
-  if (!state.availability[contextDate]) {
-    state.availability[contextDate] = {};
-  }
-
-  if (status === 'clear') {
-    delete state.availability[contextDate][state.currentUser];
-    if (Object.keys(state.availability[contextDate]).length === 0) {
-      delete state.availability[contextDate];
-    }
-  } else {
-    state.availability[contextDate][state.currentUser] = status;
-  }
-
+// ---- Logout ----
+function handleLogout() {
+  localStorage.removeItem('jeonwoo_login_state');
+  state.currentUser = null;
   saveState();
-  renderCalendar();
-  renderSummary();
-  renderMembersList();
-  closeContextMenu();
-
-  const labels = { available: '참석 가능', maybe: '미정', unavailable: '불가', clear: '선택 해제' };
-  showToast(`${contextDate.slice(5)} → ${labels[status]}`);
-
-  // Google Apps Script와 연결하여 시트에 기록 전송
-  const currentStatus = status === 'clear' ? null : status;
-  sendDataToGoogleSheet(state.currentUser, contextDate, currentStatus);
+  location.reload();
 }
 
 // ---- Month Tabs ----
@@ -448,11 +349,17 @@ function renderSummary() {
     const dateAvail = state.availability[dateStr];
     if (!dateAvail) continue;
 
-    const availCount = Object.values(dateAvail).filter(s => s === 'available').length;
-    const maybeCount = Object.values(dateAvail).filter(s => s === 'maybe').length;
+    // Collect available member names
+    const availMembers = [];
+    Object.entries(dateAvail).forEach(([memberId, status]) => {
+      if (status === 'available') {
+        const member = state.members.find(m => m.id === memberId);
+        availMembers.push(member ? member.name : memberId);
+      }
+    });
 
-    if (availCount > 0 || maybeCount > 0) {
-      datesWithAvail.push({ dateStr, day, availCount, maybeCount });
+    if (availMembers.length > 0) {
+      datesWithAvail.push({ dateStr, day, availMembers });
     }
   }
 
@@ -462,17 +369,34 @@ function renderSummary() {
   }
 
   // Sort by availability count (desc)
-  datesWithAvail.sort((a, b) => b.availCount - a.availCount || b.maybeCount - a.maybeCount);
+  datesWithAvail.sort((a, b) => b.availMembers.length - a.availMembers.length);
 
   const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
   const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
   container.innerHTML = datesWithAvail.slice(0, 8).map(d => {
     const dayOfWeek = new Date(year, month, d.day).getDay();
+    const names = d.availMembers;
+    let displayText;
+
+    if (names.length === 1) {
+      displayText = `${names[0]} 가능`;
+    } else if (names.length === 2) {
+      displayText = `${names[0]}, ${names[1]} 가능`;
+    } else {
+      displayText = `${names[0]} 외 ${names.length - 1}명 가능`;
+    }
+
+    // Full names list for popup (only show when 3+ people)
+    const allNames = names.join(', ');
+
     return `
       <div class="summary-item">
         <span class="summary-date">${monthNames[month]} ${d.day}일 (${dayNames[dayOfWeek]})</span>
-        <span class="summary-count">${d.availCount}명 가능${d.maybeCount > 0 ? ` · ${d.maybeCount}명 미정` : ''}</span>
+        <span class="summary-count summary-names-trigger" data-names="${allNames}">
+          ${displayText}
+          ${names.length >= 3 ? `<span class="summary-popup">${allNames}</span>` : ''}
+        </span>
       </div>
     `;
   }).join('');
@@ -514,6 +438,12 @@ function init() {
   document.getElementById('new-member-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') addMember();
   });
+
+  // Logout button
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+  }
 
   // Init tabs
   initMonthTabs();

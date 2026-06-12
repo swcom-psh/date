@@ -1,54 +1,54 @@
 /* =========================================
-   전우 모임 — Design System
+   테토남 모임 — Design System
    Pastel Military Theme (해병 & 특전사)
    ========================================= */
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  /* Core palette — pastel military */
-  --olive-deep:     hsl(85, 30%, 18%);
-  --olive-dark:     hsl(85, 25%, 24%);
-  --olive-mid:      hsl(85, 22%, 32%);
-  --olive-light:    hsl(85, 20%, 42%);
-  --olive-pastel:   hsl(85, 28%, 72%);
+  /* Core palette — Blue Ocean Summer */
+  --olive-deep:     hsl(205, 40%, 14%);
+  --olive-dark:     hsl(205, 35%, 18%);
+  --olive-mid:      hsl(205, 30%, 26%);
+  --olive-light:    hsl(205, 25%, 38%);
+  --olive-pastel:   hsl(198, 70%, 68%); /* Cool Sky Blue / Turquoise */
 
-  --navy-deep:      hsl(210, 35%, 14%);
-  --navy-dark:      hsl(210, 30%, 20%);
-  --navy-mid:       hsl(210, 25%, 30%);
-  --navy-pastel:    hsl(210, 30%, 60%);
+  --navy-deep:      hsl(215, 45%, 11%);
+  --navy-dark:      hsl(215, 35%, 16%);
+  --navy-mid:       hsl(215, 25%, 26%);
+  --navy-pastel:    hsl(190, 50%, 65%); /* Wave Aqua */
 
-  --khaki:          hsl(42, 30%, 65%);
-  --khaki-light:    hsl(42, 35%, 82%);
-  --khaki-dark:     hsl(42, 20%, 40%);
-  --sand:           hsl(38, 25%, 88%);
+  --khaki:          hsl(38, 40%, 68%); /* Sandy Gold */
+  --khaki-light:    hsl(38, 45%, 82%); /* Bright Sand */
+  --khaki-dark:     hsl(38, 30%, 45%);
+  --sand:           hsl(38, 30%, 90%);
 
-  --maroon:         hsl(0, 40%, 38%);
-  --maroon-pastel:  hsl(0, 35%, 55%);
-  --maroon-light:   hsl(0, 40%, 72%);
+  --maroon:         hsl(12, 55%, 45%); /* Sunset Coral */
+  --maroon-pastel:  hsl(12, 45%, 65%);
+  --maroon-light:   hsl(12, 50%, 75%);
 
-  --crimson:        hsl(348, 55%, 48%);
-  --crimson-pastel: hsl(348, 40%, 65%);
+  --crimson:        hsl(355, 55%, 48%);
+  --crimson-pastel: hsl(355, 45%, 68%);
 
   /* Semantic colors */
-  --bg-primary:     hsl(90, 15%, 10%);
-  --bg-secondary:   hsl(90, 12%, 14%);
-  --bg-card:        hsla(90, 12%, 16%, 0.7);
-  --bg-card-hover:  hsla(90, 12%, 20%, 0.85);
+  --bg-primary:     hsl(205, 35%, 7%);
+  --bg-secondary:   hsl(205, 30%, 10%);
+  --bg-card:        hsla(205, 30%, 12%, 0.65);
+  --bg-card-hover:  hsla(205, 30%, 16%, 0.85);
 
-  --text-primary:   hsl(42, 30%, 90%);
-  --text-secondary: hsl(42, 15%, 65%);
-  --text-muted:     hsl(42, 10%, 45%);
+  --text-primary:   hsl(205, 25%, 92%);
+  --text-secondary: hsl(205, 15%, 72%);
+  --text-muted:     hsl(205, 12%, 52%);
 
-  --border:         hsla(42, 15%, 35%, 0.25);
-  --border-light:   hsla(42, 15%, 50%, 0.15);
+  --border:         hsla(205, 25%, 55%, 0.2);
+  --border-light:   hsla(205, 25%, 50%, 0.12);
 
-  --glass-bg:       hsla(90, 12%, 16%, 0.55);
-  --glass-border:   hsla(42, 20%, 40%, 0.2);
+  --glass-bg:       hsla(205, 30%, 12%, 0.5);
+  --glass-border:   hsla(205, 35%, 55%, 0.18);
   --glass-shadow:   0 8px 32px hsla(0, 0%, 0%, 0.35);
 
   /* Status colors */
-  --available:      hsl(140, 45%, 50%);
-  --available-glow: hsl(140, 50%, 40%);
+  --available:      hsl(175, 60%, 48%);
+  --available-glow: hsl(175, 55%, 40%);
   --maybe:          hsl(45, 60%, 55%);
   --maybe-glow:     hsl(45, 55%, 45%);
   --unavailable:    hsl(0, 45%, 50%);
@@ -96,9 +96,9 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 800px 600px at 20% 20%, hsla(85, 30%, 25%, 0.25), transparent),
-    radial-gradient(ellipse 600px 800px at 80% 80%, hsla(210, 30%, 20%, 0.2), transparent),
-    radial-gradient(ellipse 400px 400px at 50% 50%, hsla(0, 40%, 30%, 0.08), transparent);
+    radial-gradient(ellipse 800px 600px at 20% 20%, hsla(205, 45%, 25%, 0.22), transparent),
+    radial-gradient(ellipse 600px 800px at 80% 80%, hsla(190, 40%, 20%, 0.18), transparent),
+    radial-gradient(ellipse 400px 400px at 50% 50%, hsla(40, 40%, 30%, 0.06), transparent);
 }
 
 .bg-grid {
@@ -179,6 +179,11 @@ body {
   color: var(--text-muted);
   font-weight: 500;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 /* User Badge */
 .user-badge {
@@ -229,6 +234,51 @@ body {
 
 .user-badge:hover .chevron {
   transform: translateY(2px);
+}
+
+/* Logout Button */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: hsla(0, 30%, 35%, 0.25);
+  border: 1px solid hsla(0, 25%, 50%, 0.2);
+  border-radius: 40px;
+  color: var(--maroon-pastel);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s var(--ease-out);
+  white-space: nowrap;
+}
+
+.logout-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: hsla(0, 35%, 40%, 0.35);
+  border-color: hsla(0, 30%, 55%, 0.4);
+  color: var(--maroon-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsla(0, 30%, 30%, 0.2);
+}
+
+.logout-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+@media (max-width: 768px) {
+  .logout-text {
+    display: none;
+  }
+  .logout-btn {
+    padding: 8px;
+  }
 }
 
 /* ---------- Modal ---------- */
@@ -336,9 +386,9 @@ body {
 }
 
 .member-card.selected {
-  background: hsla(85, 28%, 35%, 0.3);
+  background: hsla(205, 35%, 45%, 0.25);
   border-color: var(--olive-pastel);
-  box-shadow: 0 0 16px hsla(85, 30%, 40%, 0.2);
+  box-shadow: 0 0 16px hsla(205, 45%, 50%, 0.2);
 }
 
 .member-avatar {
@@ -424,14 +474,36 @@ body {
   z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px 60px;
+  padding: 12px 24px 12px;
+}
+
+/* App Column Layout */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 992px) {
+  .app-layout {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .app-layout .bottom-section {
+    grid-template-columns: 1fr !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 /* ---------- Month Tabs ---------- */
 .month-tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
   justify-content: center;
 }
 
@@ -474,9 +546,9 @@ body {
 }
 
 .month-tab.active {
-  background: hsla(85, 20%, 20%, 0.6);
+  background: hsla(205, 25%, 16%, 0.6);
   border-color: var(--olive-pastel);
-  box-shadow: 0 4px 20px hsla(85, 30%, 30%, 0.25);
+  box-shadow: 0 4px 20px hsla(205, 35%, 25%, 0.25);
 }
 
 .month-num {
@@ -505,7 +577,7 @@ body {
 
 /* ---------- Calendar ---------- */
 .calendar-wrapper {
-  margin-bottom: 32px;
+  margin-bottom: 12px;
 }
 
 .calendar-card {
@@ -514,7 +586,7 @@ body {
   border-radius: var(--radius-xl);
   backdrop-filter: blur(16px);
   box-shadow: var(--glass-shadow);
-  padding: 24px;
+  padding: 12px 16px;
   overflow: hidden;
 }
 
@@ -548,17 +620,17 @@ body {
 
 .day-cell {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 1.6;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.25s var(--ease-out);
+  transition: all 0.2s var(--ease-out);
   border: 1px solid transparent;
-  gap: 4px;
-  min-height: 64px;
+  gap: 2px;
+  min-height: 48px;
 }
 
 .day-cell:not(.empty):not(.other-month):hover {
@@ -684,8 +756,8 @@ body {
 /* ---------- Bottom Section ---------- */
 .bottom-section {
   display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 12px;
 }
 
 .legend-card,
@@ -695,17 +767,17 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   backdrop-filter: blur(16px);
-  padding: 20px;
+  padding: 12px 16px;
 }
 
 .legend-card h3,
 .summary-card h3,
 .members-card h3 {
   font-family: 'Black Han Sans', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   letter-spacing: 2px;
   color: var(--text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 /* Legend */
@@ -742,6 +814,11 @@ body {
 
 .legend-dot.unavailable {
   background: var(--unavailable);
+}
+
+.legend-dot.not-attending {
+  background: hsla(42, 10%, 35%, 0.4);
+  border: 1px solid hsla(42, 10%, 50%, 0.3);
 }
 
 .legend-dot.best {
@@ -787,11 +864,82 @@ body {
   border-radius: 12px;
 }
 
+/* Summary names with hover popup */
+.summary-names-trigger {
+  position: relative;
+  cursor: default;
+}
+
+.summary-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  box-shadow: 0 8px 28px hsla(0, 0%, 0%, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.95);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 60;
+}
+
+.summary-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  border: 6px solid transparent;
+  border-top-color: var(--bg-secondary);
+}
+
+.summary-names-trigger:hover .summary-popup {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+
+/* Scrollable sections */
+.summary-content,
+.members-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbars */
+.members-list::-webkit-scrollbar,
+.summary-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.members-list::-webkit-scrollbar-track,
+.summary-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.members-list::-webkit-scrollbar-thumb,
+.summary-content::-webkit-scrollbar-thumb {
+  background: hsla(205, 30%, 50%, 0.25);
+  border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb:hover,
+.summary-content::-webkit-scrollbar-thumb:hover {
+  background: hsla(205, 30%, 50%, 0.45);
+}
+
 /* Members List */
 .members-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .member-list-item {
@@ -875,7 +1023,7 @@ body {
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--border-light);
-  padding: 24px;
+  padding: 12px;
   text-align: center;
 }
 
@@ -950,14 +1098,20 @@ body {
 .bottom-section > *:nth-child(3) { animation-delay: 0.3s; }
 
 /* Day cells stagger */
-.day-cell {
-  animation: fadeInUp 0.35s var(--ease-out) both;
-}
+/* Disabled cell animation to prevent reload flickering on click */
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
   :root {
     --header-height: 60px;
+  }
+
+  .header-inner {
+    padding: 0 12px;
+  }
+
+  .logo-section {
+    gap: 8px;
   }
 
   .title-group h1 {
@@ -1016,6 +1170,18 @@ body {
 }
 
 @media (max-width: 480px) {
+  .header-inner {
+    padding: 0 8px;
+  }
+
+  .logo-section {
+    gap: 6px;
+  }
+
+  .title-group .subtitle {
+    display: none;
+  }
+
   .emblem {
     width: 36px;
     height: 36px;

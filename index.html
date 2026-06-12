@@ -1,16 +1,63 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>전우 모임 — 날짜 조율</title>
-  <meta name="description" content="해병대 & 특전사 전우 모임 날짜 조율 캘린더. 참석 가능 날짜를 표시하고 모임 일정을 잡아보세요.">
+  <title>테토남 모임 — 날짜 조율</title>
+  <meta name="description" content="해병대 & 특전사 테토남 모임 날짜 조율 캘린더. 참석 가능 날짜를 표시하고 모임 일정을 잡아보세요.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="login.css">
 </head>
+
 <body>
+  <!-- ========== Login Screen ========== -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-bg-overlay"></div>
+    <div class="login-bg-image"></div>
+    <div class="login-particles" id="login-particles"></div>
+    <div class="login-content">
+      <div class="login-emblem-glow"></div>
+      <div class="login-title-area">
+        <div class="login-emblem-icon">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <polygon points="32,4 39,24 60,24 43,36 49,56 32,44 15,56 21,36 4,24 25,24" fill="currentColor" />
+          </svg>
+        </div>
+        <h1 class="login-main-title">테토남 모임</h1>
+        <p class="login-sub-title">2026년 하계 모임</p>
+      </div>
+      <div class="login-form-area">
+        <label class="login-label" for="login-name-select">이름 선택</label>
+        <div class="login-select-wrapper">
+          <select id="login-name-select" class="login-select">
+            <option value="" disabled selected>— 이름을 선택하세요 —</option>
+          </select>
+          <div class="login-select-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
+        <button class="login-btn" id="login-btn" disabled>
+          <span class="login-btn-text">로그인</span>
+          <span class="login-btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </span>
+        </button>
+      </div>
+      <p class="login-footer-text">충성! — 상남자들의 모임</p>
+    </div>
+  </div>
+
   <!-- Background texture overlay -->
   <div class="bg-texture"></div>
   <div class="bg-grid"></div>
@@ -21,27 +68,36 @@
       <div class="logo-section">
         <div class="emblem">
           <svg viewBox="0 0 64 64" class="star-emblem" aria-hidden="true">
-            <polygon points="32,4 39,24 60,24 43,36 49,56 32,44 15,56 21,36 4,24 25,24" fill="currentColor"/>
+            <polygon points="32,4 39,24 60,24 43,36 49,56 32,44 15,56 21,36 4,24 25,24" fill="currentColor" />
           </svg>
         </div>
         <div class="title-group">
-          <h1>전우 모임</h1>
-          <p class="subtitle">날짜 조율 캘린더 — 2026</p>
+          <h1>테토남 모임</h1>
+          <p class="subtitle">2026년 하계 모임</p>
         </div>
       </div>
       <div class="header-actions">
         <div class="user-badge" id="user-badge">
           <div class="badge-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
           <span class="badge-name" id="current-user-name">이름 선택</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
+        <button class="logout-btn" id="logout-btn" title="로그아웃">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span class="logout-text">로그아웃</span>
+        </button>
       </div>
     </div>
   </header>
@@ -53,8 +109,8 @@
         <h2>참석자 선택</h2>
         <button class="modal-close" id="modal-close-btn" aria-label="닫기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -66,8 +122,8 @@
           <input type="text" id="new-member-input" placeholder="새 멤버 이름 입력" maxlength="10">
           <button class="btn btn-add" id="add-member-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             추가
           </button>
@@ -77,41 +133,43 @@
   </div>
 
   <!-- Main Content -->
-  <main id="main-content">
-    <!-- Month Navigation -->
-    <div class="month-tabs" id="month-tabs">
-      <button class="month-tab active" data-month="6" id="tab-july">
-        <span class="month-num">07</span>
-        <span class="month-name">JULY</span>
-      </button>
-      <button class="month-tab" data-month="7" id="tab-august">
-        <span class="month-num">08</span>
-        <span class="month-name">AUGUST</span>
-      </button>
-    </div>
+  <main id="main-content" class="app-layout">
+    <div class="left-column">
+      <!-- Month Navigation -->
+      <div class="month-tabs" id="month-tabs">
+        <button class="month-tab active" data-month="6" id="tab-july">
+          <span class="month-num">07</span>
+          <span class="month-name">JULY</span>
+        </button>
+        <button class="month-tab" data-month="7" id="tab-august">
+          <span class="month-num">08</span>
+          <span class="month-name">AUGUST</span>
+        </button>
+      </div>
 
-    <!-- Calendar Container -->
-    <div class="calendar-wrapper">
-      <div class="calendar-card">
-        <!-- Weekday Headers -->
-        <div class="weekday-header">
-          <div class="weekday sun">일</div>
-          <div class="weekday">월</div>
-          <div class="weekday">화</div>
-          <div class="weekday">수</div>
-          <div class="weekday">목</div>
-          <div class="weekday">금</div>
-          <div class="weekday sat">토</div>
-        </div>
-        <!-- Calendar Grid -->
-        <div class="calendar-grid" id="calendar-grid">
-          <!-- Days will be injected by JS -->
+      <!-- Calendar Container -->
+      <div class="calendar-wrapper">
+        <div class="calendar-card">
+          <!-- Weekday Headers -->
+          <div class="weekday-header">
+            <div class="weekday sun">일</div>
+            <div class="weekday">월</div>
+            <div class="weekday">화</div>
+            <div class="weekday">수</div>
+            <div class="weekday">목</div>
+            <div class="weekday">금</div>
+            <div class="weekday sat">토</div>
+          </div>
+          <!-- Calendar Grid -->
+          <div class="calendar-grid" id="calendar-grid">
+            <!-- Days will be injected by JS -->
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Legend & Summary -->
-    <div class="bottom-section">
+    <!-- Legend & Summary (Right Column) -->
+    <div class="right-column bottom-section">
       <div class="legend-card">
         <h3>범례</h3>
         <div class="legend-items">
@@ -120,16 +178,8 @@
             <span>참석 가능</span>
           </div>
           <div class="legend-item">
-            <span class="legend-dot maybe"></span>
-            <span>미정</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot unavailable"></span>
-            <span>불가</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot best"></span>
-            <span>최적 날짜</span>
+            <span class="legend-dot not-attending"></span>
+            <span>미참</span>
           </div>
         </div>
       </div>
@@ -160,10 +210,12 @@
   <footer id="main-footer">
     <div class="footer-inner">
       <div class="footer-emblem">★</div>
-      <p>전우 모임 날짜 조율 시스템 — 충성!</p>
+      <p>테토남 모임 날짜 조율 시스템 — 충성!</p>
     </div>
   </footer>
 
+  <script src="login.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
