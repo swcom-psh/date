@@ -170,11 +170,7 @@
       // Short delay to show ripple, then animate out
       setTimeout(() => {
         hideLoginAnimated(() => {
-          if (typeof init === 'function') {
-            init();
-          } else {
-            location.reload();
-          }
+          location.reload();
         });
       }, 200);
     });

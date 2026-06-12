@@ -319,7 +319,29 @@ function fetchDataFromGoogleSheet() {
           });
         });
 
-        state.availability = mappedAvailability;
+        // 덮어씌우는 대신, 로컬 데이터와 구글 시트 데이터를 안전하게 병합합니다.
+        // 현재 로그인한 사용자(state.currentUser)의 로컬 변경 사항이 구글 시트 응답의 이전 값에 의해 덮어씌워지지 않도록 보호합니다.
+        const mergedAvailability = { ...state.availability };
+        
+        Object.entries(mappedAvailability).forEach(([dateStr, nameMap]) => {
+          if (!mergedAvailability[dateStr]) {
+            mergedAvailability[dateStr] = {};
+          }
+          
+          Object.entries(nameMap).forEach(([memberId, status]) => {
+            // 로그인한 사용자 본인의 데이터는 로컬의 최신 상태를 우선 보존합니다.
+            if (state.currentUser && memberId === state.currentUser) {
+              if (mergedAvailability[dateStr][memberId] === undefined) {
+                mergedAvailability[dateStr][memberId] = status;
+              }
+            } else {
+              // 다른 사용자 데이터는 구글 시트 최신본으로 업데이트합니다.
+              mergedAvailability[dateStr][memberId] = status;
+            }
+          });
+        });
+
+        state.availability = mergedAvailability;
         saveState();
         renderCalendar();
         renderSummary();

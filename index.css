@@ -1131,6 +1131,10 @@ body {
     --header-height: 60px;
   }
 
+  .day-tooltip {
+    display: none !important;
+  }
+
   .header-inner {
     padding: 0 12px;
   }
