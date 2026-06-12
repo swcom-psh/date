@@ -6,18 +6,18 @@
 const STORE_KEY = 'jeonwoo_moim_data';
 
 const DEFAULT_MEMBERS = [
-  { id: 'm1',  name: '상현', color: 'hsl(85, 35%, 55%)'  },
-  { id: 'm2',  name: '창민', color: 'hsl(210, 40%, 55%)' },
-  { id: 'm3',  name: '진오', color: 'hsl(42, 50%, 55%)'  },
-  { id: 'm4',  name: '병선', color: 'hsl(0, 40%, 55%)'   },
-  { id: 'm5',  name: '영제', color: 'hsl(170, 40%, 50%)' },
-  { id: 'm6',  name: '대덕', color: 'hsl(280, 35%, 55%)' },
-  { id: 'm7',  name: '영민', color: 'hsl(30, 50%, 55%)'  },
-  { id: 'm8',  name: '지훈', color: 'hsl(330, 40%, 55%)' },
-  { id: 'm9',  name: '영훈', color: 'hsl(55, 45%, 50%)'  },
-  { id: 'm10', name: '재영', color: 'hsl(195, 45%, 50%)' },
-  { id: 'm11', name: '진철', color: 'hsl(140, 35%, 50%)' },
-  { id: 'm12', name: '종훈', color: 'hsl(15, 50%, 55%)'  },
+  { id: 'm1',  name: '상현', color: 'hsl(195, 80%, 45%)'  }, /* Ocean Blue */
+  { id: 'm2',  name: '창민', color: 'hsl(175, 75%, 40%)'  }, /* Deep Aqua */
+  { id: 'm3',  name: '진오', color: 'hsl(160, 70%, 42%)'  }, /* Seafoam Green */
+  { id: 'm4',  name: '병선', color: 'hsl(140, 60%, 45%)'  }, /* Bright Green */
+  { id: 'm5',  name: '영제', color: 'hsl(85, 65%, 48%)'   }, /* Lime Green */
+  { id: 'm6',  name: '대덕', color: 'hsl(50, 80%, 50%)'   }, /* Sunny Yellow */
+  { id: 'm7',  name: '영민', color: 'hsl(35, 85%, 52%)'   }, /* Sandy Gold */
+  { id: 'm8',  name: '지훈', color: 'hsl(20, 85%, 55%)'   }, /* Sunset Orange */
+  { id: 'm9',  name: '영훈', color: 'hsl(5, 80%, 58%)'    }, /* Coral Red */
+  { id: 'm10', name: '재영', color: 'hsl(330, 75%, 55%)'  }, /* Hot Pink */
+  { id: 'm11', name: '진철', color: 'hsl(280, 65%, 58%)'  }, /* Lavender */
+  { id: 'm12', name: '종훈', color: 'hsl(240, 60%, 60%)'  }, /* Royal Blue */
 ];
 
 const AVATAR_COLORS = [
@@ -54,6 +54,16 @@ function loadState() {
     if (saved) {
       const parsed = JSON.parse(saved);
       state = { ...state, ...parsed };
+      
+      // 기존에 로컬 스토리지에 저장되어 있던 멤버들의 색상도 새로운 12색 테마로 일괄 갱신합니다.
+      state.members.forEach((m, idx) => {
+        const defaultMember = DEFAULT_MEMBERS.find(dm => dm.name === m.name);
+        if (defaultMember) {
+          m.color = defaultMember.color;
+        } else {
+          m.color = `hsl(${(idx * 30) % 360}, 70%, 50%)`;
+        }
+      });
     } else {
       state.members = [...DEFAULT_MEMBERS];
     }
@@ -152,7 +162,11 @@ function renderAvailabilityDots(dateAvail) {
 
   let dots = '';
   entries.forEach(([memberId, status]) => {
-    dots += `<span class="avail-dot ${status}"></span>`;
+    if (status === 'available') {
+      const member = state.members.find(m => m.id === memberId);
+      const color = member ? member.color : 'var(--available)';
+      dots += `<span class="avail-dot" style="background-color: ${color}; box-shadow: 0 0 6px ${color};"></span>`;
+    }
   });
 
   return `<div class="availability-dots">${dots}</div>`;
@@ -236,6 +250,42 @@ function sendDataToGoogleSheet(memberId, dateStr, status) {
   .catch(error => {
     console.error('구글 시트 전송 에러:', error);
   });
+}
+
+function fetchDataFromGoogleSheet() {
+  if (APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE' || !APPS_SCRIPT_URL) {
+    console.log('Google Apps Script URL이 설정되지 않았습니다.');
+    return;
+  }
+
+  fetch(APPS_SCRIPT_URL)
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.availability) {
+        // 구글 시트의 이름 기반 데이터를 프론트엔드의 memberId 기반 데이터로 매핑
+        const mappedAvailability = {};
+        
+        Object.entries(data.availability).forEach(([dateStr, nameMap]) => {
+          mappedAvailability[dateStr] = {};
+          Object.entries(nameMap).forEach(([name, status]) => {
+            const member = state.members.find(m => m.name === name);
+            if (member) {
+              mappedAvailability[dateStr][member.id] = status;
+            }
+          });
+        });
+
+        state.availability = mappedAvailability;
+        saveState();
+        renderCalendar();
+        renderSummary();
+        renderMembersList();
+        console.log('구글 시트 일정 동기화 완료');
+      }
+    })
+    .catch(error => {
+      console.error('구글 시트 데이터 로드 에러:', error);
+    });
 }
 
 // ---- Logout ----
@@ -452,6 +502,9 @@ function init() {
   renderCalendar();
   renderSummary();
   renderMembersList();
+
+  // 구글 시트에서 최신 참석 현황 데이터 불러오기
+  fetchDataFromGoogleSheet();
 }
 
 document.addEventListener('DOMContentLoaded', init);
