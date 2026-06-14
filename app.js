@@ -407,10 +407,18 @@ function handleLogout() {
 function initMonthTabs() {
   const tabs = document.querySelectorAll('.month-tab');
   tabs.forEach(tab => {
+    // Sync tab visual state with state.currentMonth on initialization
+    if (parseInt(tab.dataset.month) === state.currentMonth) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       state.currentMonth = parseInt(tab.dataset.month);
+      saveState(); // Persist month switch
       renderCalendar();
       renderSummary();
     });
