@@ -427,6 +427,58 @@ function closeModal() {
   document.getElementById('user-modal-overlay').classList.remove('active');
 }
 
+// ---- Attendance Names Modal ----
+function openNamesModal(dateStr) {
+  const overlay = document.getElementById('names-modal-overlay');
+  const titleEl = document.getElementById('names-modal-title');
+  const gridEl = document.getElementById('names-modal-grid');
+  
+  if (!overlay || !titleEl || !gridEl) return;
+
+  const dateParts = dateStr.split('-');
+  const year = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]) - 1;
+  const day = parseInt(dateParts[2]);
+  
+  const dayOfWeek = new Date(year, month, day).getDay();
+  const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  
+  titleEl.textContent = `${monthNames[month]} ${day}일 (${dayNames[dayOfWeek]}) 참석자`;
+  
+  const dateAvail = state.availability[dateStr] || {};
+  const availMembers = [];
+  
+  Object.entries(dateAvail).forEach(([memberId, status]) => {
+    if (status === 'available') {
+      const member = state.members.find(m => m.id === memberId);
+      if (member) {
+        availMembers.push(member);
+      }
+    }
+  });
+  
+  if (availMembers.length === 0) {
+    gridEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 20px 0;">참석 예정자가 없습니다.</div>`;
+  } else {
+    gridEl.innerHTML = availMembers.map(m => `
+      <div class="member-card">
+        <div class="member-avatar" style="background: ${m.color}">${m.name.charAt(0)}</div>
+        <span class="member-name">${m.name}</span>
+      </div>
+    `).join('');
+  }
+  
+  overlay.classList.add('active');
+}
+
+function closeNamesModal() {
+  const overlay = document.getElementById('names-modal-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+}
+
 function renderMemberGrid() {
   const grid = document.getElementById('member-grid');
   grid.innerHTML = state.members.map(m => `
@@ -550,7 +602,7 @@ function renderSummary() {
     return `
       <div class="summary-item">
         <span class="summary-date">${monthNames[month]} ${d.day}일 (${dayNames[dayOfWeek]})</span>
-        <span class="summary-count summary-names-trigger" data-names="${allNames}">
+        <span class="summary-count summary-names-trigger" data-date-str="${d.dateStr}" data-names="${allNames}">
           ${displayText}
           ${names.length >= 3 ? `<span class="summary-popup">${allNames}</span>` : ''}
         </span>
@@ -589,6 +641,30 @@ function init() {
   document.getElementById('user-modal-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeModal();
   });
+
+  // Names Modal events
+  const namesCloseBtn = document.getElementById('names-modal-close-btn');
+  if (namesCloseBtn) {
+    namesCloseBtn.addEventListener('click', closeNamesModal);
+  }
+  const namesOverlay = document.getElementById('names-modal-overlay');
+  if (namesOverlay) {
+    namesOverlay.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeNamesModal();
+    });
+  }
+
+  // Summary content delegation for names popup
+  const summaryContent = document.getElementById('summary-content');
+  if (summaryContent) {
+    summaryContent.addEventListener('click', (e) => {
+      const trigger = e.target.closest('.summary-names-trigger');
+      if (trigger) {
+        const dateStr = trigger.dataset.dateStr;
+        if (dateStr) openNamesModal(dateStr);
+      }
+    });
+  }
 
   // Add member
   document.getElementById('add-member-btn').addEventListener('click', addMember);

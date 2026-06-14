@@ -132,6 +132,26 @@
     </div>
   </div>
 
+  <!-- Attendance Names Modal -->
+  <div class="modal-overlay" id="names-modal-overlay">
+    <div class="modal" id="names-modal">
+      <div class="modal-header">
+        <h2 id="names-modal-title">참석자 명단</h2>
+        <button class="modal-close" id="names-modal-close-btn" aria-label="닫기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="member-grid" id="names-modal-grid">
+          <!-- Members will be injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content -->
   <main id="main-content" class="app-layout">
     <div class="left-column">

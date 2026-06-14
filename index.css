@@ -5,55 +5,55 @@
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  /* Core palette — Blue Ocean Summer */
-  --olive-deep:     hsl(205, 40%, 14%);
-  --olive-dark:     hsl(205, 35%, 18%);
-  --olive-mid:      hsl(205, 30%, 26%);
-  --olive-light:    hsl(205, 25%, 38%);
-  --olive-pastel:   hsl(198, 70%, 68%); /* Cool Sky Blue / Turquoise */
+  /* Core palette — Premium Ivory Light Theme */
+  --olive-deep:     hsl(205, 30%, 80%);
+  --olive-dark:     hsl(205, 25%, 85%);
+  --olive-mid:      hsl(205, 20%, 90%);
+  --olive-light:    hsl(205, 15%, 95%);
+  --olive-pastel:   hsl(198, 70%, 42%); /* Cool Sky Blue (Darker for contrast) */
 
-  --navy-deep:      hsl(215, 45%, 11%);
-  --navy-dark:      hsl(215, 35%, 16%);
-  --navy-mid:       hsl(215, 25%, 26%);
-  --navy-pastel:    hsl(190, 50%, 65%); /* Wave Aqua */
+  --navy-deep:      hsl(215, 30%, 92%);
+  --navy-dark:      hsl(215, 25%, 95%);
+  --navy-mid:       hsl(215, 20%, 97%);
+  --navy-pastel:    hsl(190, 60%, 42%); /* Wave Aqua (Darker for contrast) */
 
-  --khaki:          hsl(38, 40%, 68%); /* Sandy Gold */
-  --khaki-light:    hsl(38, 45%, 82%); /* Bright Sand */
-  --khaki-dark:     hsl(38, 30%, 45%);
-  --sand:           hsl(38, 30%, 90%);
+  --khaki:          hsl(38, 30%, 50%); /* Sandy Gold (Darker for contrast) */
+  --khaki-light:    hsl(38, 40%, 42%); /* Bright Sand (Darker for contrast) */
+  --khaki-dark:     hsl(38, 30%, 32%);
+  --sand:           hsl(38, 25%, 92%);
 
   --maroon:         hsl(12, 55%, 45%); /* Sunset Coral */
-  --maroon-pastel:  hsl(12, 45%, 65%);
-  --maroon-light:   hsl(12, 50%, 75%);
+  --maroon-pastel:  hsl(12, 55%, 45%);
+  --maroon-light:   hsl(12, 45%, 35%);
 
   --crimson:        hsl(355, 55%, 48%);
-  --crimson-pastel: hsl(355, 45%, 68%);
+  --crimson-pastel: hsl(355, 50%, 40%);
 
   /* Semantic colors */
-  --bg-primary:     hsl(205, 35%, 7%);
-  --bg-secondary:   hsl(205, 30%, 10%);
-  --bg-card:        hsla(205, 30%, 12%, 0.65);
-  --bg-card-hover:  hsla(205, 30%, 16%, 0.85);
+  --bg-primary:     hsl(38, 25%, 94%); /* Warm Off-white / Ivory */
+  --bg-secondary:   hsl(38, 20%, 90%); /* Light Warm Gray */
+  --bg-card:        hsla(38, 25%, 97%, 0.85); /* Semitransparent White-Ivory */
+  --bg-card-hover:  hsla(38, 25%, 93%, 0.95);
 
-  --text-primary:   hsl(205, 25%, 92%);
-  --text-secondary: hsl(205, 15%, 72%);
-  --text-muted:     hsl(205, 12%, 52%);
+  --text-primary:   hsl(205, 35%, 15%); /* Dark Indigo for main text */
+  --text-secondary: hsl(205, 25%, 30%); /* Medium Indigo for secondary text */
+  --text-muted:     hsl(205, 15%, 45%); /* Grayish Indigo for muted text */
 
-  --border:         hsla(205, 25%, 55%, 0.2);
-  --border-light:   hsla(205, 25%, 50%, 0.12);
+  --border:         hsla(205, 25%, 15%, 0.12); /* Soft dark border */
+  --border-light:   hsla(205, 25%, 15%, 0.08);
 
-  --glass-bg:       hsla(205, 30%, 12%, 0.5);
-  --glass-border:   hsla(205, 35%, 55%, 0.18);
-  --glass-shadow:   0 8px 32px hsla(0, 0%, 0%, 0.35);
+  --glass-bg:       hsla(38, 25%, 97%, 0.75);
+  --glass-border:   hsla(205, 25%, 15%, 0.1);
+  --glass-shadow:   0 8px 32px hsla(205, 30%, 15%, 0.08);
 
-  /* Status colors */
-  --available:      hsl(175, 60%, 48%);
-  --available-glow: hsl(175, 55%, 40%);
-  --maybe:          hsl(45, 60%, 55%);
-  --maybe-glow:     hsl(45, 55%, 45%);
-  --unavailable:    hsl(0, 45%, 50%);
-  --best:           hsl(190, 60%, 50%);
-  --best-glow:      hsl(190, 55%, 40%);
+  /* Status colors (Darker and richer for light background) */
+  --available:      hsl(170, 75%, 33%); /* Forest Emerald */
+  --available-glow: hsl(170, 75%, 28%);
+  --maybe:          hsl(42, 75%, 40%); /* Rich Gold */
+  --maybe-glow:     hsl(42, 75%, 35%);
+  --unavailable:    hsl(0, 65%, 45%);
+  --best:           hsl(195, 75%, 35%); /* Deep Wave Blue */
+  --best-glow:      hsl(195, 75%, 30%);
 
   /* Sizes */
   --header-height: 72px;
@@ -113,9 +113,9 @@ body.login-active #main-footer {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 800px 600px at 20% 20%, hsla(205, 45%, 25%, 0.22), transparent),
-    radial-gradient(ellipse 600px 800px at 80% 80%, hsla(190, 40%, 20%, 0.18), transparent),
-    radial-gradient(ellipse 400px 400px at 50% 50%, hsla(40, 40%, 30%, 0.06), transparent);
+    radial-gradient(ellipse 800px 600px at 20% 20%, hsla(38, 50%, 90%, 0.5), transparent),
+    radial-gradient(ellipse 600px 800px at 80% 80%, hsla(195, 40%, 88%, 0.4), transparent),
+    radial-gradient(ellipse 400px 400px at 50% 50%, hsla(42, 30%, 85%, 0.3), transparent);
 }
 
 .bg-grid {
@@ -124,8 +124,8 @@ body.login-active #main-footer {
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(hsla(42, 15%, 30%, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, hsla(42, 15%, 30%, 0.04) 1px, transparent 1px);
+    linear-gradient(hsla(38, 20%, 40%, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(38, 20%, 40%, 0.03) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -135,7 +135,7 @@ body.login-active #main-footer {
   top: 0;
   z-index: 100;
   height: var(--header-height);
-  background: hsla(90, 15%, 10%, 0.85);
+  background: hsla(38, 25%, 96%, 0.85);
   backdrop-filter: blur(20px) saturate(1.2);
   border-bottom: 1px solid var(--border);
 }
@@ -909,7 +909,26 @@ body.login-active #main-footer {
 /* Summary names with hover popup */
 .summary-names-trigger {
   position: relative;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out);
+  border-bottom: 1px dashed transparent;
+}
+
+.summary-names-trigger:hover {
+  color: var(--khaki-light);
+  border-bottom-color: var(--khaki-light);
+  filter: brightness(1.15);
+}
+
+/* Names modal specific member cards (read-only) */
+#names-modal-grid .member-card {
   cursor: default;
+}
+
+#names-modal-grid .member-card:hover {
+  transform: none;
+  border-color: var(--border-light);
+  background: var(--glass-bg);
 }
 
 .summary-popup {
